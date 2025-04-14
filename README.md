@@ -9,7 +9,10 @@ GOOGLE_API_KEY_2=YOUR_API_KEY_2
 GOOGLE_API_KEY_3=YOUR_API_KEY_3
 PORT=YOUR_PORT #默认8000
 ```
+在客户端填入你的URL，任意API_KEY
 支持docker部署：
 ```bash
 docker pull quathor/proxy-gemini:latest
 ```
+## 注意
+本项目仅供个人学习交流使用，请注意防止隐私泄露
