@@ -1,4 +1,4 @@
-# Gemini-Reverse-Proxy
+# 简介
 本项目是一个基于 Flask 框架构建的 Gemini API 代理服务器，用于解决跨域问题，能够多api轮询，移除了安全过滤。
 
 ## 使用方法
