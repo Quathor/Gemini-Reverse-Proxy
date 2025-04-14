@@ -9,3 +9,7 @@ GOOGLE_API_KEY_2=YOUR_API_KEY_2
 GOOGLE_API_KEY_3=YOUR_API_KEY_3
 PORT=YOUR_PORT #默认8000
 ```
+支持docker部署：
+```bash
+docker pull quathor/proxy-gemini:latest
+```
