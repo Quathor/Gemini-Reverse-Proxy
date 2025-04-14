@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-
 BASE_URL = "https://generativelanguage.googleapis.com"
 INPUT_API_KEY = "GOOGLE_API_KEY_"
 OUTPUT_API_KEY = "OUTPUT_API_KEY"
@@ -43,7 +42,6 @@ def proxy(path):
                 "Access-Control-Allow-Headers": "Authorization, x-api-key, x-goog-api-key, Content-Type"
             }
         )
-
     api_key = get_api_key()
     if not api_key:
         return jsonify({"error": "no chossing_key"}), 401
@@ -54,13 +52,31 @@ def proxy(path):
 
     headers = {
         "X-Goog-Api-Key": api_key,
-        "Content-Type": request.headers.get("Content-Type", "")
     }
 
     try:
         if request.method == "POST":
-            response = requests.post(target_url, headers=headers, data=request.data)
-        else:
+            if "application/json" in request.headers.get("Content-Type", ""):
+                try:
+                    data = request.get_json()
+                    data['safetySettings'] = [
+                        {'category': 'HARM_CATEGORY_HARASSMENT', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_HATE_SPEECH', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_CIVIC_INTEGRITY', 'threshold': 'BLOCK_NONE'}
+                    ]
+                    headers["Content-Type"] = "application/json" 
+                    response = requests.post(target_url, headers=headers, json=data)
+                except Exception as e:
+                    print(f"处理 JSON 数据时出错: {e}")
+                    return jsonify({"error": "Failed to process JSON data", "details": str(e)}), 500
+            else:
+                headers["Content-Type"] = request.headers.get("Content-Type", "") 
+                response = requests.post(target_url, headers=headers, data=request.data)
+        else: # GET 请求
+            if "Content-Type" in request.headers:
+                 headers["Content-Type"] = request.headers.get("Content-Type")
             response = requests.get(target_url, headers=headers)
 
         response_headers = {
@@ -80,7 +96,6 @@ def proxy(path):
 
 @app.errorhandler(404)
 def not_found(error):
-    """Handle 404 errors with more details."""
     message = str(error)  
     return jsonify({"error": "Not Found", "message": message}), 404
 
